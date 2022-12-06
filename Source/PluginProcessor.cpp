@@ -183,6 +183,14 @@ void SimpleEQ1AudioProcessor::setStateInformation (const void* data, int sizeInB
     // whose contents will have been created by the getStateInformation() call.
 }
 
+
+//(1) declare the parameter layout used by the audio processor value tree state
+
+juce::AudioProcessorValueTreeState::ParameterLayout
+SimpleEQ1AudioProcessor::createParameterLayout() {
+
+}
+
 //==============================================================================
 // This creates new instances of the plugin..
 juce::AudioProcessor* JUCE_CALLTYPE createPluginFilter()
