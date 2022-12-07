@@ -166,7 +166,9 @@ bool SimpleEQ1AudioProcessor::hasEditor() const
 
 juce::AudioProcessorEditor* SimpleEQ1AudioProcessor::createEditor()
 {
-    return new SimpleEQ1AudioProcessorEditor (*this);
+    //return new SimpleEQ1AudioProcessorEditor (*this);
+    //(2)
+    return new juce::GenericAudioProcessorEditor(*this);
 }
 
 //==============================================================================
@@ -189,6 +191,58 @@ void SimpleEQ1AudioProcessor::setStateInformation (const void* data, int sizeInB
 juce::AudioProcessorValueTreeState::ParameterLayout
 SimpleEQ1AudioProcessor::createParameterLayout() {
 
+    //first of all we create the layout itself
+    juce::AudioProcessorValueTreeState::ParameterLayout layout;
+
+    //we can now add paramaters to the layout
+    layout.add(std::make_unique< juce::AudioParameterFloat>(
+        "LowCut Freq",                                           //parameter ID
+        "LowCut Freq",                                           //parameter name
+        juce::NormalisableRange<float>(20.f, 20000.f, 1.f, 1.f), //range, step value=1, skew
+        20.f)                                                    //default value
+    );
+
+    layout.add(std::make_unique< juce::AudioParameterFloat>(
+        "HighCut Freq",                                             //parameter ID
+        "HighCut Freq",                                             //parameter name
+        juce::NormalisableRange<float>(20.f, 20000.f, 1.f, 1.f),    //range, step value=1, skew
+        20000.f)                                                    //default value
+    );
+
+    layout.add(std::make_unique< juce::AudioParameterFloat>(
+        "Peak Freq",                                                //parameter ID
+        "Peak Freq",                                                //parameter name
+        juce::NormalisableRange<float>(20.f, 20000.f, 1.f, 1.f),    //range, step value=1, skew
+        750.f)                                                      //default value
+    );
+
+    layout.add(std::make_unique< juce::AudioParameterFloat>(
+        "Peak Gain",                                                //parameter ID
+        "Peak Gain",                                                //parameter name
+        juce::NormalisableRange<float>(-24.f, 24.f, 0.5f, 1.f),     //range, step value=0.5, skew
+        0.0f)                                                       //default value
+    );
+    
+    layout.add(std::make_unique< juce::AudioParameterFloat>(
+        "Peak Quality",                                              //parameter ID
+        "Peak Quality",                                              //parameter name
+        juce::NormalisableRange<float>(0.1f, 10.f, 0.05f, 1.f),      //range, step value=0.5, skew
+        1.f)                                                         //default value
+    );
+
+    //create the choices for steepness of LCF and HCF
+    juce::StringArray stringArray;
+    for (int i = 0; i < 4; i++) {
+        juce::String str;
+        str << (12 + i * 12);
+        str << " dB/Oct";
+        stringArray.add(str);
+    }
+
+    layout.add(std::make_unique<juce::AudioParameterChoice>("LowCut Slope", "LowCut Slope", stringArray, 0));
+    layout.add(std::make_unique<juce::AudioParameterChoice>("HighCut Slope", "HighCut Slope", stringArray, 0));
+
+    return layout;
 }
 
 //==============================================================================
