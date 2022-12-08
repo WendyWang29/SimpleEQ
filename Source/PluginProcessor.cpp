@@ -93,8 +93,15 @@ void SimpleEQ1AudioProcessor::changeProgramName (int index, const juce::String& 
 //==============================================================================
 void SimpleEQ1AudioProcessor::prepareToPlay (double sampleRate, int samplesPerBlock)
 {
-    // Use this method as the place to do any pre-playback
-    // initialisation that you need..
+    //(4) prepare the filters to use (=pass the process spec) +add its attributes
+    juce::dsp::ProcessSpec spec;
+    spec.sampleRate = sampleRate;
+    spec.maximumBlockSize = samplesPerBlock;
+    spec.numChannels = 1; //each monochain can handle only 1 channel...
+
+    //prepare the L and R monochain to run with the spec parameters...
+    leftChain.prepare(spec);
+    rightChain.prepare(spec);
 }
 
 void SimpleEQ1AudioProcessor::releaseResources()
