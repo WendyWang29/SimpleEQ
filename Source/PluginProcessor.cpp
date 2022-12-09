@@ -192,8 +192,21 @@ void SimpleEQ1AudioProcessor::setStateInformation (const void* data, int sizeInB
 }
 
 
-//(1) declare the parameter layout used by the audio processor value tree state
+//(6) define the helper function that gives us the parameters from the chain
+ChainSettings getChainSettings(juce::AudioProcessorValueTreeState& apvts) {
+    ChainSettings settings;
 
+    settings.lowCutFreq = apvts.getRawParameterValue("LowCut Freq")->load();
+    settings.highCutFreq = apvts.getRawParameterValue("HighCut Freq")->load();
+    settings.peakFreq = apvts.getRawParameterValue("Peak Freq")->load();
+    settings.peakGainInDecibels = apvts.getRawParameterValue("Peak Gain")->load();
+    settings.lowCutSlope = apvts.getRawParameterValue("LowCut Slope")->load();
+    settings.highCutSlope = apvts.getRawParameterValue("HighCut Slope")->load();
+    return settings;
+}
+
+
+//(1) declare the parameter layout used by the audio processor value tree state
 juce::AudioProcessorValueTreeState::ParameterLayout
 SimpleEQ1AudioProcessor::createParameterLayout() {
 
