@@ -102,6 +102,20 @@ void SimpleEQ1AudioProcessor::prepareToPlay (double sampleRate, int samplesPerBl
     //prepare the L and R monochain to run with the spec parameters...
     leftChain.prepare(spec);
     rightChain.prepare(spec);
+
+    //(7) set the filter parameters (get the param, compute coefficients, apply coeff. to filters)
+   
+    auto chainSettings = getChainSettings(apvts);  
+  
+    auto peakCoefficients = juce::dsp::IIR::Coefficients<float>::makePeakFilter(
+        sampleRate,
+        chainSettings.peakFreq,
+        chainSettings.peakQuality,
+        juce::Decibels::decibelsToGain(chainSettings.peakGainInDecibels)
+    );
+
+    *leftChain.get<ChainPositions::Peak>().coefficients = *peakCoefficients;
+    *rightChain.get<ChainPositions::Peak>().coefficients = *peakCoefficients;
 }
 
 void SimpleEQ1AudioProcessor::releaseResources()
@@ -150,6 +164,20 @@ void SimpleEQ1AudioProcessor::processBlock (juce::AudioBuffer<float>& buffer, ju
     // this code if your algorithm always overwrites all the output channels.
     for (auto i = totalNumInputChannels; i < totalNumOutputChannels; ++i)
         buffer.clear (i, 0, buffer.getNumSamples());
+
+
+    //(8) sliders update
+    auto chainSettings = getChainSettings(apvts);
+
+    auto peakCoefficients = juce::dsp::IIR::Coefficients<float>::makePeakFilter(
+        getSampleRate(),
+        chainSettings.peakFreq,
+        chainSettings.peakQuality,
+        juce::Decibels::decibelsToGain(chainSettings.peakGainInDecibels)
+    );
+
+    *leftChain.get<ChainPositions::Peak>().coefficients = *peakCoefficients;
+    *rightChain.get<ChainPositions::Peak>().coefficients = *peakCoefficients;
 
     //(5) create an audio block to wrap the buffer + extract channels + create ptocessing context
     juce::dsp::AudioBlock<float> block(buffer);
@@ -231,7 +259,7 @@ SimpleEQ1AudioProcessor::createParameterLayout() {
     layout.add(std::make_unique< juce::AudioParameterFloat>(
         "Peak Freq",                                                //parameter ID
         "Peak Freq",                                                //parameter name
-        juce::NormalisableRange<float>(20.f, 20000.f, 1.f, 1.f),    //range, step value=1, skew
+        juce::NormalisableRange<float>(20.f, 20000.f, 1.f, .25f),   //range, step value=1, skew=0.25
         750.f)                                                      //default value
     );
 

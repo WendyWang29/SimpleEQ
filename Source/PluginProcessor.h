@@ -86,6 +86,12 @@ private:
     using MonoChain = juce::dsp::ProcessorChain<CutFilter, Filter, CutFilter>;
 
     MonoChain leftChain, rightChain;
+
+
+    //(7) definition of enum to access the links in the chain
+    enum ChainPositions {
+        LowCut, Peak, HighCut
+    };
     
     //==============================================================================
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (SimpleEQ1AudioProcessor)
