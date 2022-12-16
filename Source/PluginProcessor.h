@@ -104,7 +104,17 @@ private:
     enum ChainPositions {
         LowCut, Peak, HighCut
     };
+
+    //(10) refactoring (start with stuff that configures the peak filter)
+    void updatePeakFilter(const ChainSettings& chainSettings);
+
+    //(10) create alias for IIR coefficients
+    using Coefficients = Filter::CoefficientsPtr;
     
+    //(10) function for updating cut filter coefficients
+    static void updateCoefficients(Coefficients& old, const Coefficients& replacements);
+
+
     //==============================================================================
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (SimpleEQ1AudioProcessor)
 };
