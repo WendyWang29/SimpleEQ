@@ -114,6 +114,13 @@ private:
     //(10) function for updating cut filter coefficients
     static void updateCoefficients(Coefficients& old, const Coefficients& replacements);
 
+    //(11.a) helper function for the switch statement in the function updateutFilter
+    template<int Index, typename ChainType, typename CoefficientType>
+    void update(ChainType& chain, const CoefficientType& coefficients) {
+        updateCoefficients(chain.get<Index>().coefficients, coefficients[Index]);
+        chain.setBypassed<Index>(false);
+    }
+
     //(11) refactoring of the low cut filter coefficients
     template<typename ChainType, typename CoefficientType>
         void updateCutFilter(
@@ -128,38 +135,19 @@ private:
 
             //(9.a) switch case for low cut params
             switch (lowCutSlope) {
-            case Slope_12: {
-                *leftLowCut.get<0>().coefficients = *cutCoefficients[0];
-                leftLowCut.setBypassed<0>(false);
-                break;
-            }
-            case Slope_24: {
-                *leftLowCut.get<0>().coefficients = *cutCoefficients[0];
-                leftLowCut.setBypassed<0>(false);
-                *leftLowCut.get<1>().coefficients = *cutCoefficients[1];
-                leftLowCut.setBypassed<1>(false);
-                break;
-            }
-            case Slope_36: {
-                *leftLowCut.get<0>().coefficients = *cutCoefficients[0];
-                leftLowCut.setBypassed<0>(false);
-                *leftLowCut.get<1>().coefficients = *cutCoefficients[1];
-                leftLowCut.setBypassed<1>(false);
-                *leftLowCut.get<2>().coefficients = *cutCoefficients[2];
-                leftLowCut.setBypassed<2>(false);
-                break;
-            }
-            case Slope_48: {
-                *leftLowCut.get<0>().coefficients = *cutCoefficients[0];
-                leftLowCut.setBypassed<0>(false);
-                *leftLowCut.get<1>().coefficients = *cutCoefficients[1];
-                leftLowCut.setBypassed<1>(false);
-                *leftLowCut.get<2>().coefficients = *cutCoefficients[2];
-                leftLowCut.setBypassed<2>(false);
-                *leftLowCut.get<3>().coefficients = *cutCoefficients[3];
-                leftLowCut.setBypassed<3>(false);
-                break;
-            }
+
+            case Slope_48:{
+                update<3>(leftLowCut, cutCoefficients);
+                }
+            case Slope_36:{
+                update<2>(leftLowCut, cutCoefficients);
+                }
+            case Slope_24:{
+                update<1>(leftLowCut, cutCoefficients);
+                }
+            case Slope_12:{
+                update<0>(leftLowCut, cutCoefficients);
+                }
             }
 
     }
